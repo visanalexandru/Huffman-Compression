@@ -13,10 +13,10 @@ namespace Huffman{
 	}
 
 	void addBuffer(const buffer&buff,uint8_t*data){
-			uint32_t numbits=buff.write_cursor;
+		uint32_t numbits=buff.write_cursor;
 
-			memcpy(data,&numbits,sizeof(numbits));
-			memcpy(data+sizeof(numbits),&buff.data[0],buff.data.size());	
+		memcpy(data,&numbits,sizeof(numbits));
+		memcpy(data+sizeof(numbits),&buff.data[0],buff.data.size());	
 	}
 
 	buffer readBuffer(const uint8_t*data){
@@ -47,12 +47,14 @@ namespace Huffman{
 		cpy.resize(size);
 		memcpy(&cpy[0],data,size);
 
-		
+
 		std::string paths[256];
 		node*root=createTree(cpy);
-		assignPaths(root,paths,"");
 
-		
+		if(!root->isLeaf)
+			assignPaths(root,paths,"");
+		else paths[(int)cpy[0]]="0";
+
 		buffer compressed,tree;
 
 		for(const uint8_t&a:cpy){
@@ -75,7 +77,7 @@ namespace Huffman{
 		buffer compressed=readBuffer(data);
 		buffer tree=readBuffer(data+sizeof(uint32_t)+compressed.data.size());	
 
-		
+
 		node*root=loadTree(tree);
 		std::vector<uint8_t> to_return;
 
@@ -150,20 +152,26 @@ namespace Huffman{
 	}
 
 	void decodeHuffman(buffer&code,std::vector<uint8_t>&destination,node*root){
-		
+
 		node*here=root;
+		if(here->isLeaf){
+			destination.insert(destination.end(),code.write_cursor,here->data);
+		}
+		else{
 
-		while(!code.reachedEnd()){
-			bool bit=code.readBit();
-			if(!bit){
-				here=here->left;
-			}
-			else here=here->right;
+			while(!code.reachedEnd()){
+				bool bit=code.readBit();
+				if(!bit){
+					here=here->left;
+				}
+				else here=here->right;
 
-			if(here->isLeaf){
-				destination.push_back(here->data);
-				here=root;
+				if(here->isLeaf){
+					destination.push_back(here->data);
+					here=root;
+				}
 			}
 		}
+
 	}
 }

@@ -9,13 +9,9 @@ using namespace std;
 
 int main(){
 
-	ifstream in("input");
+	string to_compress="aaaaaaaaaa";
 
-	stringstream buffer;
-    buffer << in.rdbuf();
-	string to_compress=buffer.str();
 	
-
 	vector<uint8_t> raw;
 	raw.resize(to_compress.length());
 	memcpy(&raw[0],&to_compress[0],to_compress.length());
