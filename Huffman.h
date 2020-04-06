@@ -51,6 +51,14 @@ namespace Huffman{
 		buffer():write_cursor(0),read_cursor(0){
 
 		}
+		buffer(const std::string&data):write_cursor(0),read_cursor(0){
+			for(char a:data){
+				if(a=='1')
+					addBit(true);
+				else if(a=='0')
+					addBit(false);
+			}
+		}
 		bool reachedEnd(){
 			return write_cursor==read_cursor;
 		}
@@ -63,6 +71,10 @@ namespace Huffman{
 				data[write_cursor/8]|=(1<<(write_cursor%8));
 
 			write_cursor++;
+		}
+		bool getBit(int index){
+
+			return data[index/8]&(1<<(index%8));
 		}
 		void addByte(uint8_t byte){
 			if(write_cursor%8==0){
@@ -79,6 +91,17 @@ namespace Huffman{
 				data[write_cursor/8+1]|=r;
 			}
 			write_cursor+=8;
+		}
+		void addBuffer(buffer&to_add){
+			int last=to_add.read_cursor;
+			while(to_add.read_cursor<=to_add.write_cursor-8){
+				addByte(to_add.readByte());
+			}
+			
+			while(!to_add.reachedEnd()){
+				addBit(to_add.readBit());
+			}
+			to_add.read_cursor=last;
 		}
 
 
@@ -118,8 +141,7 @@ namespace Huffman{
 	std::vector<uint8_t> decompress(const uint8_t*data);
 
 	node* createTree(const std::vector<uint8_t>&bytes);
-	void assignPaths(node*here,std::string*paths,std::string curr);
-	void addToBuffer(buffer&buff,const std::string&to_add);
+	void assignPaths(node*here,buffer*paths,std::string curr);
 	void decodeHuffman(buffer&code,std::vector<uint8_t>&destination,node*here);
 	void saveTree(node*here,buffer&tree_data);
 	node*loadTree(buffer&tree_data);

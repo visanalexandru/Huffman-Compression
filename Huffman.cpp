@@ -3,21 +3,14 @@
 namespace Huffman{
 
 
-	void addToBuffer(buffer&buff,const std::string&to_add){
-
-		for(const char&a:to_add){
-			if(a=='1')
-				buff.addBit(true);
-			else buff.addBit(false);
-		}
-	}
-
 	void addBuffer(const buffer&buff,uint8_t*data){
 		uint32_t numbits=buff.write_cursor;
 
 		memcpy(data,&numbits,sizeof(numbits));
 		memcpy(data+sizeof(numbits),&buff.data[0],buff.data.size());	
 	}
+
+
 
 	buffer readBuffer(const uint8_t*data){
 		uint32_t numbits;
@@ -48,18 +41,20 @@ namespace Huffman{
 		memcpy(&cpy[0],data,size);
 
 
-		std::string paths[256];
+		buffer paths[256];
 		node*root=createTree(cpy);
 
-		if(!root->isLeaf)
+		if(!root->isLeaf){
 			assignPaths(root,paths,"");
-		else paths[(int)cpy[0]]="0";
+		}
+		else {
+			paths[(int)cpy[0]]=buffer("0");	
+		}
 
 		buffer compressed,tree;
 
 		for(const uint8_t&a:cpy){
-			const std::string&to_add=paths[(int)a];
-			addToBuffer(compressed,to_add);
+			compressed.addBuffer(paths[(int)a]);
 		}
 
 		saveTree(root,tree);
@@ -76,8 +71,8 @@ namespace Huffman{
 	std::vector<uint8_t> decompress(const uint8_t*data){
 		buffer compressed=readBuffer(data);
 		buffer tree=readBuffer(data+sizeof(uint32_t)+compressed.data.size());	
-
-
+		
+		
 		node*root=loadTree(tree);
 		std::vector<uint8_t> to_return;
 
@@ -141,9 +136,9 @@ namespace Huffman{
 		}
 	}
 
-	void assignPaths(node*here,std::string*paths,std::string curr){
+	void assignPaths(node*here,buffer*paths,std::string curr){
 		if(here->isLeaf){
-			paths[(int)(here->data)]=curr;
+			paths[(int)(here->data)]=buffer(curr);
 		}
 		else{
 			assignPaths(here->left,paths,curr+'0');

@@ -5,19 +5,22 @@
 using namespace std;
 
 
-
-
 int main(){
-
-	string to_compress="aaaaaaaaaa";
-
 	
+	double a =clock();
+	ifstream in("input");
+
+	stringstream buffer;
+    buffer << in.rdbuf();
+	string to_compress=buffer.str();
+	
+
 	vector<uint8_t> raw;
 	raw.resize(to_compress.length());
 	memcpy(&raw[0],&to_compress[0],to_compress.length());
 
 
-	double a =clock();
+
 	vector<uint8_t> compressed=Huffman::compress(&raw[0],to_compress.length());
 	cout<<(clock()-a)/CLOCKS_PER_SEC<<std::endl;
 
