@@ -65,6 +65,7 @@ namespace Huffman{
 		addBuffer(compressed,&to_return[0]);
 		addBuffer(tree,&to_return[sizeof(uint32_t)+compressed.data.size()]);
 
+		delete root;
 		return to_return;
 	}
 
@@ -78,6 +79,7 @@ namespace Huffman{
 
 		decodeHuffman(compressed,to_return,root);
 
+		delete root;
 		return to_return;
 
 	}

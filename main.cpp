@@ -6,7 +6,9 @@ using namespace std;
 
 
 int main(){
-	
+
+
+
 	double a =clock();
 	ifstream in("input");
 

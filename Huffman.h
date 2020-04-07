@@ -31,6 +31,10 @@ namespace Huffman{
 		isLeaf(false){
 
 		}
+		~node(){
+			delete left;
+			delete right;
+		}
 	};
 
 	struct heapCompare{
@@ -52,7 +56,7 @@ namespace Huffman{
 
 		}
 		buffer(const std::string&data):write_cursor(0),read_cursor(0){
-			for(char a:data){
+			for(const char&a:data){
 				if(a=='1')
 					addBit(true);
 				else if(a=='0')
@@ -71,11 +75,7 @@ namespace Huffman{
 				data[write_cursor/8]|=(1<<(write_cursor%8));
 
 			write_cursor++;
-		}
-		bool getBit(int index){
-
-			return data[index/8]&(1<<(index%8));
-		}
+		}	
 		void addByte(uint8_t byte){
 			if(write_cursor%8==0){
 				data.push_back(byte);
