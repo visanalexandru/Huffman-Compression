@@ -11,7 +11,7 @@ namespace Huffman{
 		memcpy(data,&buff.data[0],buff.data.size());	
 	}
 
-	uint32_t readInt(const uint8_t*data){
+	unsigned int readInt(const uint8_t*data){
 		uint32_t to_return;
 		memcpy(&to_return,data,sizeof(to_return));
 		return to_return;
@@ -48,7 +48,7 @@ namespace Huffman{
 			assignPaths(root,paths,"");
 		}
 		else {
-			paths[data[0]]=buffer("0");	
+			paths[(int)data[0]]=buffer("0");	
 		}
 
 		buffer compressed,tree;
@@ -58,35 +58,47 @@ namespace Huffman{
 		}
 
 		saveTree(root,tree);
-		int total_size=compressed.data.size()+tree.data.size()+2*sizeof(uint32_t);		
+		int total_size=compressed.data.size()+tree.data.size()+3*sizeof(uint32_t);		
 		if(buffer_size<total_size)
 			return Status::BufferTooSmall;
 
 		buffer_size=total_size;
-		addInt(compressed.write_cursor,compress_buffer);
-		addInt(tree.write_cursor,compress_buffer+sizeof(uint32_t));
+		addInt(size,compress_buffer);
+		addInt(compressed.write_cursor,compress_buffer+sizeof(uint32_t));
+		addInt(tree.write_cursor,compress_buffer+2*sizeof(uint32_t));
 
-		addBuffer(compressed,compress_buffer+2*sizeof(uint32_t));
-		addBuffer(tree,compress_buffer+2*sizeof(uint32_t)+compressed.data.size());
+		addBuffer(compressed,compress_buffer+3*sizeof(uint32_t));
+		addBuffer(tree,compress_buffer+3*sizeof(uint32_t)+compressed.data.size());
 
 
 
 		delete root;
 		return Status::Done;
 	}
+	unsigned int getUncompressedSize(const uint8_t*compressed){
+		return readInt(compressed);
+	}
 	Status decompress(const uint8_t*data,int size,uint8_t*decompress_buffer,int&buffer_size){
 	
-		if(size<2*sizeof(uint32_t))
+		if(size<3*sizeof(uint32_t))
 			return Status::InvalidInput;
 
-		unsigned int comp_bits=readInt(data);
-		unsigned int tree_bits=readInt(data+sizeof(uint32_t));
+		unsigned int total_size=getUncompressedSize(data);
+		if(total_size>buffer_size)
+			return Status::BufferTooSmall;
+
+
+		unsigned int comp_bits=readInt(data+sizeof(uint32_t));
+		unsigned int tree_bits=readInt(data+2*sizeof(uint32_t));
 
 		unsigned int comp_size=bitsToBytes(comp_bits);
 		unsigned int tree_size=bitsToBytes(tree_bits);
 
-		buffer compressed=readBuffer(data+2*sizeof(uint32_t),comp_bits);
-		buffer tree=readBuffer(data+2*sizeof(uint32_t)+comp_size,tree_bits);	
+		if(size<comp_size+tree_size+3*sizeof(uint32_t))
+			return Status::InvalidInput;
+
+		buffer compressed=readBuffer(data+3*sizeof(uint32_t),comp_bits);
+		buffer tree=readBuffer(data+3*sizeof(uint32_t)+comp_size,tree_bits);	
 
 
 

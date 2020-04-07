@@ -32,8 +32,8 @@ int main(){
 	std::cout<<compressed_size<<std::endl;
 
 	vector<uint8_t> decompressed;
-	decompressed.resize(raw.size());
-	int decompressed_size=raw.size();
+	decompressed.resize(Huffman::getUncompressedSize(&compressed[0]));
+	int decompressed_size=decompressed.size();
 	Huffman::decompress(&compressed[0],compressed_size,&decompressed[0],decompressed_size);
 	cout<<(clock()-a)/CLOCKS_PER_SEC<<std::endl;
 

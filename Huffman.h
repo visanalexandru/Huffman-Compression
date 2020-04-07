@@ -140,11 +140,12 @@ namespace Huffman{
 	unsigned int bitsToBytes(unsigned int numbits);
 	void addInt(uint32_t to_add,uint8_t*data); 
 	void addBuffer(const buffer&buff,uint8_t*data);
-	uint32_t readInt(const uint8_t*data);
+	unsigned int readInt(const uint8_t*data);
 	buffer readBuffer(const uint8_t*data,int numbits);
 
 	Status compress(const uint8_t*data,int size,uint8_t*compress_buffer,int&buffer_size);
 	Status decompress(const uint8_t*data,int size,uint8_t*decompress_buffer,int&buffer_size);
+	unsigned int getUncompressedSize(const uint8_t*compressed);
 
 	node* createTree(const uint8_t*bytes,int size);
 	void assignPaths(node*here,buffer*paths,std::string curr);
