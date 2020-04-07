@@ -8,6 +8,11 @@
 #include<iostream>
 
 namespace Huffman{
+	enum Status{
+		BufferTooSmall,
+		InvalidInput,
+		Done
+	};
 	struct node{
 		node*left,*right;
 		uint8_t data;
@@ -132,17 +137,18 @@ namespace Huffman{
 		}
 	};
 
-
-
+	unsigned int bitsToBytes(unsigned int numbits);
+	void addInt(uint32_t to_add,uint8_t*data); 
 	void addBuffer(const buffer&buff,uint8_t*data);
-	buffer readBuffer(const uint8_t*data);
+	uint32_t readInt(const uint8_t*data);
+	buffer readBuffer(const uint8_t*data,int numbits);
 
-	std::vector<uint8_t>  compress(const uint8_t*data,int size);
-	std::vector<uint8_t> decompress(const uint8_t*data);
+	Status compress(const uint8_t*data,int size,uint8_t*compress_buffer,int&buffer_size);
+	Status decompress(const uint8_t*data,int size,uint8_t*decompress_buffer,int&buffer_size);
 
 	node* createTree(const std::vector<uint8_t>&bytes);
 	void assignPaths(node*here,buffer*paths,std::string curr);
-	void decodeHuffman(buffer&code,std::vector<uint8_t>&destination,node*here);
+	void decodeHuffman(buffer&code,uint8_t*destination,node*here);
 	void saveTree(node*here,buffer&tree_data);
 	node*loadTree(buffer&tree_data);
 }

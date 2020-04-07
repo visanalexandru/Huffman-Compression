@@ -22,14 +22,21 @@ int main(){
 	memcpy(&raw[0],&to_compress[0],to_compress.length());
 
 
-
-	vector<uint8_t> compressed=Huffman::compress(&raw[0],to_compress.length());
+	vector<uint8_t> compressed;
+	compressed.resize(raw.size()*2);
+	int compressed_size=compressed.size();
+	Huffman::compress(&raw[0],raw.size(),&compressed[0],compressed_size);
 	cout<<(clock()-a)/CLOCKS_PER_SEC<<std::endl;
 
 	a=clock();
-	std::cout<<compressed.size()<<std::endl;
-	vector<uint8_t> decompressed=Huffman::decompress(&compressed[0]);
+	std::cout<<compressed_size<<std::endl;
+
+	vector<uint8_t> decompressed;
+	decompressed.resize(raw.size());
+	int decompressed_size=raw.size();
+	Huffman::decompress(&compressed[0],compressed_size,&decompressed[0],decompressed_size);
 	cout<<(clock()-a)/CLOCKS_PER_SEC<<std::endl;
+
 	if(decompressed==raw)
 		std::cout<<"YES";
 
