@@ -146,7 +146,7 @@ namespace Huffman{
 	Status compress(const uint8_t*data,int size,uint8_t*compress_buffer,int&buffer_size);
 	Status decompress(const uint8_t*data,int size,uint8_t*decompress_buffer,int&buffer_size);
 
-	node* createTree(const std::vector<uint8_t>&bytes);
+	node* createTree(const uint8_t*bytes,int size);
 	void assignPaths(node*here,buffer*paths,std::string curr);
 	void decodeHuffman(buffer&code,uint8_t*destination,node*here);
 	void saveTree(node*here,buffer&tree_data);

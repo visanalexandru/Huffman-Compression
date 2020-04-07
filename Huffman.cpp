@@ -38,28 +38,23 @@ namespace Huffman{
 	}
 
 	Status compress(const uint8_t*data,int size,uint8_t*compress_buffer,int&buffer_size){
-		std::vector<uint8_t> cpy;
 
-
-
-		cpy.resize(size);
-		memcpy(&cpy[0],data,size);
 
 
 		buffer paths[256];
-		node*root=createTree(cpy);
+		node*root=createTree(data,size);
 
 		if(!root->isLeaf){
 			assignPaths(root,paths,"");
 		}
 		else {
-			paths[(int)cpy[0]]=buffer("0");	
+			paths[data[0]]=buffer("0");	
 		}
 
 		buffer compressed,tree;
 
-		for(const uint8_t&a:cpy){
-			compressed.addBuffer(paths[(int)a]);
+		for(int i=0;i<size;i++){
+			compressed.addBuffer(paths[(int)data[i]]);
 		}
 
 		saveTree(root,tree);
@@ -103,13 +98,14 @@ namespace Huffman{
 	}
 
 
-	node*createTree(const std::vector<uint8_t>&bytes){
+	node*createTree(const uint8_t*bytes,int size){
 		int frequency[256]{};
 		std::priority_queue<node*,std::vector<node*>,heapCompare> heap;
 
-		for(uint8_t a:bytes){
-			frequency[(int)a]++;
+		for(int i=0;i<size;i++){
+			frequency[(int)bytes[i]]++;
 		}
+
 
 		for(int i=0;i<256;i++){
 
