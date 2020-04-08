@@ -9,13 +9,15 @@
 
 namespace HuffmanInternal{
 
+
+	//The huffman binary tree is built using this structure
 	struct node{
 		node*left,*right;
 		uint8_t data;
 		int cost;
 		bool isLeaf;
 
-
+		//is a leaf node
 		node(uint8_t byte,int value):left(nullptr),
 		right(nullptr),
 		data(byte),
@@ -24,7 +26,7 @@ namespace HuffmanInternal{
 		{
 
 		}
-
+		//If it is a parent node, its cost will be equal to the sum its children
 		node(node*l,node*r):left(l),
 		right(r),
 		data(' '),
@@ -32,11 +34,14 @@ namespace HuffmanInternal{
 		isLeaf(false){
 
 		}
+
+		//delete the children
 		~node(){
 			delete left;
 			delete right;
 		}
 	};
+
 
 	struct heapCompare{
 
@@ -47,7 +52,9 @@ namespace HuffmanInternal{
 	};
 
 
-
+	/* This structure is a buffer than supports addition of individual bits. This is useful because each 
+	 * huffman code can be smaller than a byte.
+	 */
 	struct buffer{
 		std::vector<uint8_t> data;
 		int write_cursor;
@@ -133,20 +140,30 @@ namespace HuffmanInternal{
 		}
 	};
 
-
+	//Copies the integer into the output buffer
 	void addInt(uint32_t to_add,uint8_t*data);
+	//Copies the buffer into the output buffer
 	void addBuffer(const buffer&buff,uint8_t*data);
 
+	//Reads an integer from the input buffer
 	unsigned int readInt(const uint8_t*data);
+
+	//Reads a buffer from the input buffer, and sets its writing cursor accordingly
 	buffer readBuffer(const uint8_t*data,int numbits);
-
-
+	//How many bytes are required to hold given bit count
 	unsigned int bitsToBytes(unsigned int numbits);
-	node*createTree(const uint8_t*bytes,int size);	
-	node*loadTree(buffer&tree_data);
 
+	//Creates huffman tree from input data
+	node*createTree(const uint8_t*bytes,int size);	
+	//Loads a huffman tree from a buffer
+	node*loadTree(buffer&tree_data);
+	//Saves a huffman tree to a buffer
 	void saveTree(node*here,buffer&tree_data);
+
+	//Creates the prefix codes for every node in the huffman tree
 	void assignPaths(node*here,buffer*paths,std::string curr);
+
+	//Decodes the huffman code contained in the buffer
 	void decodeHuffman(buffer&code,uint8_t*destination,node*root);
 
 }
